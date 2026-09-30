@@ -13,6 +13,10 @@
   <title>Gem Blast</title>
 
   <link rel="stylesheet" href="Style.css">
+  <link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gem Blast">
 </head>
 
 <body>
@@ -408,6 +412,13 @@
   <div id="toastContainer"></div>
 
   <script src="Script.js"></script>
+  <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js");
+    });
+  }
+</script>
 
 </body>
 </html>
