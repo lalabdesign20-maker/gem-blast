@@ -1,424 +1,1547 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Gem Blast Master - Commercial Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  touch-action:none;
+}
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-  >
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:'Fredoka', Arial, Helvetica, sans-serif;
+  background:#090a15;
+}
 
-  <meta name="theme-color" content="#0b0815">
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
-  <title>Gem Blast</title>
+button{
+  border:0;
+  font:inherit;
+  cursor:pointer;
+}
 
-  <link rel="stylesheet" href="Style.css">
-  <link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Gem Blast">
+#game{
+  position:relative;
+  width:100%;
+  height:100%;
+  max-width:520px;
+  overflow:hidden;
+  background:linear-gradient(160deg,#2b1055,#0f051d);
+  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+
+.screen{
+  position:absolute;
+  inset:0;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  padding-top:50px;
+}
+
+.screen.active{
+  display:flex;
+  animation: screenFadeIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes screenFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+#menu{
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 0, 128, 0.25), transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.2), transparent 50%),
+    linear-gradient(150deg,#3a1c71,#d76d77,#ffaf7b);
+}
+
+.logo{
+  text-align:center;
+  margin-bottom:28px;
+  animation: logoFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoFloat {
+  0% { transform: translateY(0) rotate(-2deg); }
+  100% { transform: translateY(-8px) rotate(1deg); }
+}
+
+.logo h1{
+  margin:0;
+  font-size:clamp(46px,14vw,76px);
+  font-weight:900;
+  letter-spacing:-1px;
+  color:#fff;
+  background: linear-gradient(180deg, #ffffff 30%, #ffe57f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 6px 0 #520268) drop-shadow(0 12px 25px rgba(0,0,0,0.5));
+}
+
+.logo .sub{
+  display:inline-block;
+  margin-top:6px;
+  padding:6px 20px;
+  border-radius:999px;
+  background:linear-gradient(180deg, #ffe082, #ffb300);
+  color:#3e2723;
+  font-weight:900;
+  font-size:13px;
+  letter-spacing:3px;
+  box-shadow:0 4px 0 #b26a00, 0 8px 15px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+}
+
+.menuCard{
+  width:min(390px,94vw);
+  padding:24px 20px;
+  border-radius:32px;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.4);
+}
+
+.menuButton{
+  position: relative;
+  width:100%;
+  min-height:60px;
+  margin:8px 0;
+  border-radius:20px;
+  background:linear-gradient(180deg, #ffd54f 0%, #ff8f00 100%);
+  color:#3e1f00;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:0.5px;
+  box-shadow:0 6px 0 #b25000, 0 12px 20px rgba(0,0,0,0.35);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.2s;
+  overflow: hidden;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+}
+
+.menuButton::after{
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(60deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
+  transform: rotate(25deg) translateX(-100%);
+  animation: shimmer 3.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: rotate(25deg) translateX(-100%); }
+  20%, 100% { transform: rotate(25deg) translateX(100%); }
+}
+
+.menuButton:hover {
+  filter: brightness(1.08);
+}
+
+.menuButton:active{
+  transform:translateY(4px);
+  box-shadow:0 2px 0 #b25000, 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.menuButton.secondary{
+  background:linear-gradient(180deg, #4fc3f7 0%, #0288d1 100%);
+  color:#ffffff;
+  box-shadow:0 6px 0 #01579b, 0 12px 20px rgba(0,0,0,0.35);
+  text-shadow: 0 2px 3px rgba(0,0,0,0.3);
+}
+
+.menuButton.secondary:active{
+  box-shadow:0 2px 0 #01579b;
+}
+
+.smallText{
+  text-align:center;
+  margin-top:14px;
+  color:rgba(255,255,255,0.7);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing: 0.5px;
+}
+
+#gameScreen{
+  background:#0e101e;
+}
+
+#canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+.hud{
+  position:absolute;
+  top:50px;
+  left:14px;
+  right:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  pointer-events:none;
+  z-index:5;
+}
+
+.hudBox{
+  background:rgba(20, 22, 45, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius:18px;
+  padding:8px 14px;
+  color:#fff;
+  box-shadow:0 8px 20px rgba(0,0,0,0.4);
+  font-weight:900;
+  font-size:13px;
+  letter-spacing:0.5px;
+}
+
+.hudBox span {
+  font-size:16px;
+  color:#ffd54f;
+  text-shadow: 0 0 10px rgba(255,213,79,0.5);
+}
+
+.hudScore{ min-width:100px; }
+.hudLevel{ flex:1; text-align:center; }
+.hudCombo{ min-width:90px; color:#ff7043; text-align:right;}
+.hudCombo span{ color:#ff7043; text-shadow: 0 0 10px rgba(255,112,67,0.5); }
+
+.hudPause{
+  width:46px;
+  height:46px;
+  pointer-events:auto;
+  border-radius:16px;
+  background:linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+  color:#311b92;
+  font-size:20px;
+  font-weight:900;
+  box-shadow:0 5px 0 #9e9e9e, 0 8px 15px rgba(0,0,0,0.3);
+  transition: transform 0.1s;
+}
+
+.hudPause:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #9e9e9e;
+}
+
+.progressWrap{
+  position:absolute;
+  top:110px;
+  left:24px;
+  right:24px;
+  height:14px;
+  border-radius:999px;
+  background:rgba(0, 0, 0, 0.4);
+  border:1px solid rgba(255,255,255,0.1);
+  overflow:hidden;
+  box-shadow:inset 0 3px 6px rgba(0,0,0,0.6);
+  z-index:5;
+}
+
+.progress{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#00e676,#ffeb3b,#ff1744);
+  box-shadow: 0 0 12px rgba(0,230,118,0.8);
+  transition:width .35s ease-out;
+}
+
+.dockArea{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:12px;
+  height:120px;
+  display:flex;
+  align-items:center;
+  justify-content:space-evenly;
+  z-index:10;
+  background:transparent;
+}
+
+.dockSlot{
+  width:30%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dockSlot:hover {
+  transform: scale(1.05);
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  background:rgba(10, 10, 25, 0.82);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  z-index:30;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.overlay.show{ display:flex; }
+
+.panel{
+  width:min(390px,94vw);
+  padding:28px 24px;
+  border-radius:32px;
+  background:linear-gradient(180deg, #ffffff 0%, #f3e5f5 100%);
+  color:#311b92;
+  box-shadow:0 30px 70px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.9);
+  text-align:center;
+  border: 3px solid #e1bee7;
+  animation: panelPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes panelPop {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.panel h2{ 
+  margin:0 0 12px; 
+  font-size:36px; 
+  font-weight: 900;
+  background: linear-gradient(180deg, #7b1fa2, #4a148c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1));
+}
+
+.panel p{ color:#616161; line-height:1.45; font-weight:700; margin-bottom: 20px; }
+
+.panelButton{
+  position: relative;
+  width:100%;
+  min-height:56px;
+  margin-top:10px;
+  border-radius:20px;
+  background:linear-gradient(180deg, #ffd54f 0%, #ff8f00 100%);
+  color:#3e1f00;
+  font-weight:900;
+  font-size:18px;
+  box-shadow:0 5px 0 #b25000, 0 8px 15px rgba(0,0,0,0.25);
+  overflow: hidden;
+  transition: transform 0.1s;
+}
+
+.panelButton:active {
+  transform: translateY(3px);
+  box-shadow:0 2px 0 #b25000;
+}
+
+.panelButton.blue{ 
+  background:linear-gradient(180deg, #4fc3f7 0%, #0288d1 100%); 
+  color:#fff; 
+  box-shadow:0 5px 0 #01579b, 0 8px 15px rgba(0,0,0,0.25); 
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.panelButton.blue:active { box-shadow:0 2px 0 #01579b; }
+
+.panelButton.red{ 
+  background:linear-gradient(180deg, #ff5252 0%, #d50000 100%); 
+  color:#fff; 
+  box-shadow:0 5px 0 #8e0000, 0 8px 15px rgba(0,0,0,0.25); 
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.panelButton.red:active { box-shadow:0 2px 0 #8e0000; }
+
+.statRow{ display:flex; justify-content:space-around; gap:10px; margin:20px 0; }
+.stat{ 
+  flex:1; 
+  padding:14px 8px; 
+  border-radius:20px; 
+  background:rgba(233, 30, 99, 0.06); 
+  border: 1.5px solid rgba(233, 30, 99, 0.15);
+}
+.stat b{ display:block; font-size:26px; color:#4a148c; font-weight:900; }
+.stat span{ font-size:11px; color:#8e24aa; font-weight:900; letter-spacing: 0.5px; }
+
+#settings .panel{ max-height:88vh; overflow:auto; }
+
+.setting{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 0;
+  border-bottom:2px dashed #e1bee7;
+  text-align:left;
+}
+
+.settingTitle{ font-weight:900; color:#311b92; }
+.settingSub{ display:block; font-size:12px; color:#7e57c2; margin-top:2px; font-weight:700; }
+
+.switch{
+  width:60px;
+  height:34px;
+  border-radius:20px;
+  padding:4px;
+  background:#cfd8dc;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  transition:.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.switch i{
+  display:block;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:white;
+  transition:.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow:0 3px 6px rgba(0,0,0,0.3);
+}
+
+.switch.on{ background:#00e676; }
+.switch.on i{ transform:translateX(26px); }
+.range{ width:120px; accent-color:#7b1fa2; }
+
+#leaderboardList{ margin:15px 0; max-height:240px; overflow-y:auto; }
+.rankRow{ 
+  display:flex; 
+  align-items:center; 
+  gap:10px; 
+  padding:12px 14px; 
+  margin:8px 0; 
+  border-radius:18px; 
+  background:#f3e5f5; 
+  border: 1px solid #e1bee7;
+}
+.rankNum{ width:32px; font-weight:900; color:#4a148c; font-size:16px; }
+.rankName{ flex:1; text-align:left; font-weight:900; color:#311b92;}
+.rankScore{ font-weight:900; color:#f57f17; font-size:16px; }
+
+#adScreen{ background:#090a14; z-index:50; }
+.adBox{
+  width:min(360px,90vw);
+  min-height:420px;
+  border-radius:32px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  text-align:center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.adFake{
+  width:220px;
+  height:180px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#ff4081,#7c4dff);
+  box-shadow:0 15px 35px rgba(124,77,255,0.4);
+  animation:adPulse 1.3s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:900;
+  font-size:24px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+@keyframes adPulse{ from{transform:scale(.95)} to{transform:scale(1.03)} }
+#adCountdown{ font-size:32px; font-weight:900; color:#311b92; margin-top:16px; }
+#adClose{ display:none; width:100%; min-height:54px; margin-top:16px; border-radius:18px; background:#ffca28; color:#3e2723; font-weight:900; font-size:17px; }
+
+#toast{
+  position:absolute;
+  left:50%;
+  top:22%;
+  transform:translate(-50%,-50%) scale(.5);
+  padding:12px 28px;
+  border-radius:999px;
+  background:linear-gradient(180deg, #ffffff, #f5f5f5);
+  color:#4a148c;
+  font-size:22px;
+  font-weight:900;
+  box-shadow:0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.4);
+  opacity:0;
+  pointer-events:none;
+  z-index:20;
+  white-space:nowrap;
+  text-align:center;
+  border: 2px solid #e1bee7;
+}
+
+#toast.show{ animation:toastPop .9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+@keyframes toastPop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+  70%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-80%) scale(1.05)}
+}
+
+#comboBanner{
+  position:absolute;
+  left:50%;
+  top:38%;
+  transform:translate(-50%,-50%) scale(0);
+  font-size:48px;
+  font-weight:900;
+  font-style:italic;
+  color:#ffeb3b;
+  text-shadow:0 6px 0 #e65100, 0 0 30px #ff1744;
+  pointer-events:none;
+  z-index:22;
+}
+
+#comboBanner.animate{ animation:comboPop 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+@keyframes comboPop{
+  0%{ transform:translate(-50%,-50%) scale(0) rotate(-12deg); opacity:0;}
+  30%{ transform:translate(-50%,-50%) scale(1.3) rotate(6deg); opacity:1;}
+  70%{ transform:translate(-50%,-50%) scale(1) rotate(0deg); opacity:1;}
+  100%{ transform:translate(-50%,-65%) scale(0.8); opacity:0;}
+}
+
+#levelTransition{
+  position:absolute;
+  inset:0;
+  z-index:25;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(15,8,30,0.88);
+  backdrop-filter: blur(8px);
+}
+
+#levelTransition.show{ display:flex; animation:fadeIn .25s; }
+
+.transitionTitle{ text-align:center; color:#fff; animation:levelPop .8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.transitionTitle .big{ font-size:72px; font-weight:900; text-shadow:0 8px 0 #7b1fa2, 0 0 30px rgba(255,235,59,0.6); color:#ffeb3b;}
+.transitionTitle .small{ margin-top:5px; font-size:22px; font-weight:900; letter-spacing:4px; color:#e040fb; }
+
+@keyframes levelPop{
+  0%{transform:scale(.2) rotate(-10deg);opacity:0}
+  60%{transform:scale(1.1) rotate(3deg);opacity:1}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+
+.bannerAd{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:42px;
+  background:#141526;
+  color:#9e9e9e;
+  font-size:10px;
+  font-weight: 700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  letter-spacing:2px;
+  z-index:100;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+</style>
 </head>
-
 <body>
 
-  <!-- =========================
-       MENU PRINCIPALE
-  ========================== -->
+<div id="game">
+
+  <div class="bannerAd">PUBLICITÀ BANNER GOOGLE ADSENSE</div>
 
   <section id="menu" class="screen active">
-
-    <div class="menuBackgroundGlow glow1"></div>
-    <div class="menuBackgroundGlow glow2"></div>
-
-    <div class="logoWrap">
-      <div class="logoGem">💎</div>
-      <div class="logoSpark spark1">✦</div>
-      <div class="logoSpark spark2">✦</div>
-      <div class="logoSpark spark3">✧</div>
+    <div class="logo">
+      <h1>GEM BLAST</h1>
+      <div class="sub">CARTOON EDITION</div>
     </div>
 
-    <h1>GEM BLAST</h1>
-
-    <p class="subtitle">
-      Rompi, combina e fai esplodere!
-    </p>
-
-    <div class="playerCard">
-
-      <div class="playerTop">
-        <span>⭐ LIVELLO <strong id="menuLevel">1</strong></span>
-        <span>🪙 <strong id="menuCoins">0</strong></span>
-      </div>
-
-      <div class="xpBar">
-        <div id="menuXpFill"></div>
-      </div>
-
-      <div class="xpText">
-        <span id="menuXp">0</span> XP
-      </div>
-
+    <div class="menuCard">
+      <button class="menuButton" id="classicBtn">CLASSICA</button>
+      <button class="menuButton" id="adventureBtn">AVVENTURA</button>
+      <button class="menuButton secondary" id="leaderboardBtn">CLASSIFICA ONLINE</button>
+      <button class="menuButton secondary" id="settingsBtn">IMPOSTAZIONI</button>
+      <div class="smallText">Gem Blast • Block Puzzle Game</div>
     </div>
-
-    <button id="playButton" class="mainButton">
-      <span>▶</span> GIOCA
-    </button>
-
-    <button id="missionsButton" class="secondaryButton">
-      🎯 MISSIONI
-    </button>
-
-    <button id="statsButton" class="secondaryButton">
-      📊 STATISTICHE
-    </button>
-
-    <button id="howButton" class="secondaryButton">
-      ❓ COME SI GIOCA
-    </button>
-
-    <div class="menuBottom">
-
-      <div>
-        🏆 RECORD
-        <strong id="menuBest">0</strong>
-      </div>
-
-      <button id="soundButtonMenu" class="iconButton">
-        🔊
-      </button>
-
-    </div>
-
   </section>
 
+  <section id="gameScreen" class="screen">
+    <canvas id="canvas"></canvas>
 
-  <!-- =========================
-       COME SI GIOCA
-  ========================== -->
+    <div class="hud">
+      <div class="hudBox hudScore">SCORE <span id="score">0</span></div>
+      <div class="hudBox hudLevel"><span id="modeLabel">LIV</span> <span id="level">1</span></div>
+      <div class="hudBox hudCombo">COMBO <span id="combo">x0</span></div>
+      <button class="hudPause" id="pauseBtn">II</button>
+    </div>
 
-  <section id="howTo" class="screen">
+    <div class="progressWrap">
+      <div class="progress" id="progress"></div>
+    </div>
 
+    <div class="dockArea" id="dockArea">
+      <div class="dockSlot" id="slot0"></div>
+      <div class="dockSlot" id="slot1"></div>
+      <div class="dockSlot" id="slot2"></div>
+    </div>
+
+    <div id="toast"></div>
+    <div id="comboBanner">COMBO x2!</div>
+
+    <div id="levelTransition">
+      <div class="transitionTitle">
+        <div class="big" id="transitionLevel">2</div>
+        <div class="small" id="transitionSub">LIVELLO COMPLETATO</div>
+      </div>
+    </div>
+
+    <div class="overlay" id="pauseOverlay">
+      <div class="panel">
+        <h2>PAUSA</h2>
+        <p>Partita temporaneamente sospesa.</p>
+        <button class="panelButton" id="resumeBtn">CONTINUA</button>
+        <button class="panelButton blue" id="pauseSettingsBtn">IMPOSTAZIONI</button>
+        <button class="panelButton red" id="quitBtn">ESCI</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="gameOverOverlay">
+      <div class="panel">
+        <h2 id="gameOverTitle">GAME OVER</h2>
+        <div class="statRow">
+          <div class="stat"><b id="finalScore">0</b><span>PUNTI</span></div>
+          <div class="stat"><b id="finalLevel">1</b><span>LIVELLO</span></div>
+          <div class="stat"><b id="finalCombo">0</b><span>MAX COMBO</span></div>
+        </div>
+        <button class="panelButton" id="continueAdBtn">🎬 CONTINUA CON ADS</button>
+        <button class="panelButton blue" id="restartBtn">NUOVA PARTITA</button>
+        <button class="panelButton red" id="menuFromGameBtn">MENU</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="settings" class="screen">
     <div class="panel">
-
-      <div class="panelHeader">
-        <h2>💎 Come si gioca</h2>
-        <button id="howClose" class="closeButton">×</button>
+      <h2>IMPOSTAZIONI</h2>
+      <div class="setting">
+        <div><span class="settingTitle">Musica</span><span class="settingSub">Sottofondo Synth Cartoon</span></div>
+        <button class="switch" id="musicSwitch"><i></i></button>
       </div>
-
-      <div class="instruction">
-        <span>🧩</span>
-        <p>Trascina i blocchi sulla griglia.</p>
+      <div class="setting">
+        <div><span class="settingTitle">Volume Musica</span><span class="settingSub">Regola audio</span></div>
+        <input class="range" id="musicVolume" type="range" min="0" max="1" step=".05">
       </div>
-
-      <div class="instruction">
-        <span>✨</span>
-        <p>Completa una riga o una colonna per eliminarla.</p>
+      <div class="setting">
+        <div><span class="settingTitle">Effetti Sonori</span><span class="settingSub">Suoni blocchi e combo</span></div>
+        <button class="switch" id="sfxSwitch"><i></i></button>
       </div>
-
-      <div class="instruction">
-        <span>🔥</span>
-        <p>Fai eliminazioni consecutive per aumentare il combo.</p>
-      </div>
-
-      <div class="instruction">
-        <span>💣</span>
-        <p>Le bombe distruggono una zona 3×3.</p>
-      </div>
-
-      <div class="instruction">
-        <span>💎</span>
-        <p>Le gemme speciali eliminano tutte le gemme dello stesso colore.</p>
-      </div>
-
-      <div class="instruction">
-        <span>⭐</span>
-        <p>Guadagna XP e sali di livello.</p>
-      </div>
-
-      <div class="instruction">
-        <span>🪙</span>
-        <p>Completa missioni per ottenere monete.</p>
-      </div>
-
-      <button id="backButton" class="mainButton">
-        INDIETRO
-      </button>
-
+      <button class="panelButton blue" id="settingsBack">SALVA E TORNA</button>
     </div>
-
   </section>
 
-
-  <!-- =========================
-       MISSIONI
-  ========================== -->
-
-  <section id="missions" class="screen">
-
+  <section id="leaderboard" class="screen">
     <div class="panel">
-
-      <div class="panelHeader">
-        <h2>🎯 Missioni</h2>
-        <button id="missionsClose" class="closeButton">×</button>
-      </div>
-
-      <div id="missionsList"></div>
-
+      <h2>CLASSIFICA ONLINE</h2>
+      <div id="leaderboardList"></div>
+      <p class="smallText">Classifica Globale Aggiornata</p>
+      <button class="panelButton blue" id="leaderboardBack">INDIETRO</button>
     </div>
-
   </section>
 
-
-  <!-- =========================
-       STATISTICHE
-  ========================== -->
-
-  <section id="stats" class="screen">
-
-    <div class="panel">
-
-      <div class="panelHeader">
-        <h2>📊 Statistiche</h2>
-        <button id="statsClose" class="closeButton">×</button>
-      </div>
-
-      <div class="statsGrid">
-
-        <div class="statBox">
-          <span>🏆</span>
-          <small>Record</small>
-          <strong id="statBest">0</strong>
-        </div>
-
-        <div class="statBox">
-          <span>🎮</span>
-          <small>Partite</small>
-          <strong id="statGames">0</strong>
-        </div>
-
-        <div class="statBox">
-          <span>💥</span>
-          <small>Linee</small>
-          <strong id="statLines">0</strong>
-        </div>
-
-        <div class="statBox">
-          <span>🔥</span>
-          <small>Combo max</small>
-          <strong id="statCombo">0</strong>
-        </div>
-
-        <div class="statBox">
-          <span>🧩</span>
-          <small>Blocchi</small>
-          <strong id="statBlocks">0</strong>
-        </div>
-
-        <div class="statBox">
-          <span>⭐</span>
-          <small>Livello</small>
-          <strong id="statLevel">1</strong>
-        </div>
-
-      </div>
-
+  <section id="adScreen" class="screen">
+    <div class="adBox">
+      <div class="adFake">SPONSOR AD</div>
+      <h2>REWARDED VIDEO</h2>
+      <p>Guarda lo sponsor per continuare la partita e non perdere lo score!</p>
+      <div id="adCountdown">5</div>
+      <button id="adClose">RIVIVE E CONTINUA</button>
     </div>
-
   </section>
 
-
-  <!-- =========================
-       GIOCO
-  ========================== -->
-
-  <section id="game" class="screen">
-
-    <div class="gameHeader">
-
-      <button id="menuButton" class="smallButton">
-        ☰
-      </button>
-
-      <div class="gameTitle">
-        <span>GEM BLAST</span>
-        <small>LV <strong id="gameLevel">1</strong></small>
-      </div>
-
-      <button id="pauseButton" class="smallButton">
-        ⏸
-      </button>
-
-    </div>
-
-
-    <div class="gameStats">
-
-      <div class="gameStat">
-        <small>PUNTI</small>
-        <strong id="score">0</strong>
-      </div>
-
-      <div class="gameStat">
-        <small>RECORD</small>
-        <strong id="best">0</strong>
-      </div>
-
-      <div class="gameStat comboStat">
-        <small>COMBO</small>
-        <strong id="combo">0</strong>
-      </div>
-
-      <div class="gameStat">
-        <small>🪙</small>
-        <strong id="gameCoins">0</strong>
-      </div>
-
-    </div>
-
-
-    <div class="gameXp">
-
-      <div class="gameXpBar">
-        <div id="gameXpFill"></div>
-      </div>
-
-      <span id="gameXpText">
-        0 / 100 XP
-      </span>
-
-    </div>
-
-
-    <div id="message" class="message"></div>
-
-
-    <div id="board"></div>
-
-
-    <div class="piecesTitle">
-      SCEGLI UN BLOCCO
-    </div>
-
-    <div id="pieces"></div>
-
-
-    <div class="gameBottom">
-
-      <button id="soundButtonGame" class="gameToolButton">
-        🔊 AUDIO
-      </button>
-
-      <div class="miniMission">
-        🎯 <span id="gameMissionText">Missione</span>
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       PAUSA
-  ========================== -->
-
-  <section id="pauseOverlay" class="overlay">
-
-    <div class="modal">
-
-      <div class="modalIcon">⏸️</div>
-
-      <h2>PAUSA</h2>
-
-      <button id="resumeButton" class="mainButton">
-        ▶ RIPRENDI
-      </button>
-
-      <button id="pauseMenuButton" class="secondaryButton">
-        🏠 MENU
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       GAME OVER
-  ========================== -->
-
-  <section id="gameOver" class="overlay">
-
-    <div class="modal gameOverModal">
-
-      <div class="gameOverEmoji">
-        💥
-      </div>
-
-      <h2>GAME OVER</h2>
-
-      <p class="resultLabel">
-        PUNTEGGIO
-      </p>
-
-      <strong id="finalScore" class="finalScore">
-        0
-      </strong>
-
-      <div id="newRecord" class="newRecord">
-        🏆 NUOVO RECORD!
-      </div>
-
-      <div class="resultStats">
-
-        <div>
-          <span>🔥</span>
-          <small>Combo</small>
-          <strong id="finalCombo">0</strong>
-        </div>
-
-        <div>
-          <span>⭐</span>
-          <small>XP</small>
-          <strong id="finalXp">0</strong>
-        </div>
-
-        <div>
-          <span>🪙</span>
-          <small>Monete</small>
-          <strong id="finalCoins">0</strong>
-        </div>
-
-      </div>
-
-      <button id="restartButton" class="mainButton">
-        🔄 RIGIOCA
-      </button>
-
-      <button id="gameOverMenu" class="secondaryButton">
-        🏠 MENU
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       PARTICELLE
-  ========================== -->
-
-  <div id="particles"></div>
-
-  <div id="toastContainer"></div>
-
-  <script src="Script.js"></script>
-  <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js");
+</div>
+
+<script>
+(() => {
+"use strict";
+
+// Polyfill per roundRect per garantire compatibilità
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+    let r = typeof radii === 'number' ? radii : (Array.isArray(radii) ? radii[0] : 0);
+    r = Math.min(r, w / 2, h / 2);
+    this.beginPath();
+    this.moveTo(x + r, y);
+    this.arcTo(x + w, y, x + w, y + h, r);
+    this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r);
+    this.arcTo(x, y, x + w, y, r);
+    this.closePath();
+    return this;
+  };
+}
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const screens = {
+  menu: document.getElementById("menu"),
+  game: document.getElementById("gameScreen"),
+  settings: document.getElementById("settings"),
+  leaderboard: document.getElementById("leaderboard"),
+  ad: document.getElementById("adScreen")
+};
+
+const scoreEl = document.getElementById("score");
+const levelEl = document.getElementById("level");
+const comboEl = document.getElementById("combo");
+const modeLabel = document.getElementById("modeLabel");
+const progressEl = document.getElementById("progress");
+const toastEl = document.getElementById("toast");
+const comboBanner = document.getElementById("comboBanner");
+
+const levelTransition = document.getElementById("levelTransition");
+const transitionLevel = document.getElementById("transitionLevel");
+const transitionSub = document.getElementById("transitionSub");
+
+const pauseOverlay = document.getElementById("pauseOverlay");
+const gameOverOverlay = document.getElementById("gameOverOverlay");
+
+const finalScore = document.getElementById("finalScore");
+const finalLevel = document.getElementById("finalLevel");
+const finalCombo = document.getElementById("finalCombo");
+const continueAdBtn = document.getElementById("continueAdBtn");
+
+const musicSwitch = document.getElementById("musicSwitch");
+const musicVolume = document.getElementById("musicVolume");
+const sfxSwitch = document.getElementById("sfxSwitch");
+
+const leaderboardList = document.getElementById("leaderboardList");
+const adCountdown = document.getElementById("adCountdown");
+const adClose = document.getElementById("adClose");
+
+const savedSettings = JSON.parse(localStorage.getItem("gb_settings") || "{}");
+const settings = {
+  music: savedSettings.music !== false,
+  sfx: savedSettings.sfx !== false,
+  volume: Number.isFinite(savedSettings.volume) ? savedSettings.volume : 0.3
+};
+
+function saveSettings(){
+  localStorage.setItem("gb_settings", JSON.stringify(settings));
+}
+
+function updateSettingsUI(){
+  musicSwitch.classList.toggle("on", settings.music);
+  sfxSwitch.classList.toggle("on", settings.sfx);
+  musicVolume.value = settings.volume;
+}
+updateSettingsUI();
+
+let actx = null;
+let isMusicPlaying = false;
+
+function initAudio(){
+  if(!actx){
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(actx.state === "suspended") actx.resume();
+}
+
+function tone(freq, duration, type="sine", vol=0.05, delay=0){
+  if(!settings.sfx) return;
+  initAudio();
+  setTimeout(() => {
+    try {
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, actx.currentTime);
+      gain.gain.setValueAtTime(vol * settings.volume * 2, actx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(actx.destination);
+      osc.start();
+      osc.stop(actx.currentTime + duration);
+    } catch(e){}
+  }, delay);
+}
+
+function playMusic(){
+  if(!settings.music) return;
+  initAudio();
+  if(isMusicPlaying) return;
+  isMusicPlaying = true;
+  
+  let step = 0;
+  const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+  
+  function loopMusic(){
+    if(!isMusicPlaying || !settings.music) return;
+    const f = notes[step % notes.length];
+    tone(f, 0.15, "triangle", 0.02);
+    if(step % 4 === 0) tone(130.81, 0.25, "sine", 0.04);
+    step++;
+    setTimeout(loopMusic, 220);
+  }
+  loopMusic();
+}
+
+function stopMusic(){
+  isMusicPlaying = false;
+}
+
+function soundPlace(){
+  tone(300, 0.06, "square", 0.03);
+  tone(450, 0.08, "square", 0.03, 40);
+}
+
+function soundClear(lines){
+  for(let i=0; i<lines; i++){
+    tone(500 + (i*150), 0.12, "triangle", 0.06, i*60);
+    tone(800 + (i*200), 0.15, "sine", 0.04, i*60 + 30);
+  }
+}
+
+function soundCombo(c){
+  tone(400 * c, 0.2, "sawtooth", 0.05);
+}
+
+const GRID = 8;
+let cell = 40;
+let board = [];
+
+let dockPieces = [null, null, null];
+let draggingPiece = null;
+let dragSourceIndex = -1;
+let dragPos = {x: 0, y: 0};
+
+let score = 0;
+let level = 1;
+let combo = 0;
+let maxCombo = 0;
+let linesCleared = 0;
+let gameMode = "classic";
+
+let running = false;
+let paused = false;
+let continueUsed = false;
+
+let particles = [];
+let floatingTexts = [];
+let shake = 0;
+let lastTime = 0;
+
+const THEMES = [
+  { name: "Candy", bg1:"#2b1055", bg2:"#0f051d", colors:["#ff3d71","#ffaa00","#00e676","#00b0ff","#d500f9","#ffea00"] },
+  { name: "Neon", bg1:"#0a192f", bg2:"#020c1b", colors:["#00e676","#00e5ff","#d500f9","#ff1744","#ffea00","#ff9100"] },
+  { name: "Toon", bg1:"#11998e", bg2:"#38ef7d", colors:["#ff9800","#e91e63","#9c27b0","#00bcd4","#8bc34a","#ffeb3b"] },
+  { name: "Cosmic", bg1:"#1a2a6c", bg2:"#b21f1f", colors:["#ea80fc","#8c9eff","#80d8ff","#a7ffeb","#ffe57f","#ff9e80"] }
+];
+
+function currentTheme(){
+  return THEMES[(level - 1) % THEMES.length];
+}
+
+const PIECES = [
+  [[0,0]],
+  [[0,0],[1,0]],
+  [[0,0],[0,1]],
+  [[0,0],[1,0],[2,0]],
+  [[0,0],[0,1],[0,2]],
+  [[0,0],[1,0],[0,1]],
+  [[0,0],[1,0],[0,1],[1,1]],
+  [[0,0],[1,0],[2,0],[3,0]],
+  [[0,0],[0,1],[0,2],[0,3]],
+  [[0,0],[1,0],[2,0],[0,1]],
+  [[0,0],[1,0],[2,0],[2,1]],
+  [[0,0],[1,0],[1,1],[2,1]],
+  [[0,0],[1,0],[2,0],[1,1]],
+  [[0,0],[1,0],[2,0],[0,1],[0,2]],
+  [[0,0],[1,0],[2,0],[1,1],[1,2]],
+  [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1]],
+  [[0,0],[1,0],[2,0],[3,0],[4,0]]
+];
+
+// Generazione pezzi con difficoltà graduale in base al livello
+function getRandomPiece(){
+  let availablePieces = PIECES;
+  
+  if (level === 1) {
+    // Livello 1: forme più facili e compatte (da 1 a 4 blocchi)
+    availablePieces = PIECES.slice(0, 9);
+  } else if (level === 2) {
+    // Livello 2: aggiunge forme a L e T
+    availablePieces = PIECES.slice(0, 13);
+  }
+  // Livello 3+: tutti i pezzi (inclusi i blocchi grandi da 5)
+
+  const shape = availablePieces[Math.floor(Math.random() * availablePieces.length)];
+  const colorIdx = Math.floor(Math.random() * currentTheme().colors.length);
+  return {
+    cells: shape.map(p => [...p]),
+    color: colorIdx,
+    size: shape.length
+  };
+}
+
+function createBoard(){
+  board = Array.from({length: GRID}, () => Array(GRID).fill(null));
+  
+  if(gameMode === "adventure"){
+    const obstacles = Math.min(10, level * 2);
+    for(let i=0; i<obstacles; i++){
+      const rx = Math.floor(Math.random() * GRID);
+      const ry = Math.floor(Math.random() * GRID);
+      board[ry][rx] = { color: 0, alpha: 1, obstacle: true };
+    }
+  }
+}
+
+function boardOrigin(){
+  const total = cell * GRID;
+  return {
+    x: (canvas.clientWidth - total) / 2,
+    y: 130
+  };
+}
+
+function resize(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.floor(canvas.clientWidth * dpr);
+  canvas.height = Math.floor(canvas.clientHeight * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const usableW = Math.min(canvas.clientWidth - 28, 420);
+  const usableH = canvas.clientHeight - 275;
+  cell = Math.floor(Math.min(usableW / GRID, usableH / GRID));
+  
+  renderDockUI();
+}
+window.addEventListener("resize", resize);
+
+function drawGem(c, x, y, size, colorHex, scale=1, alpha=1){
+  const s = size * scale;
+  c.save();
+  c.globalAlpha = alpha;
+  c.translate(x + size/2, y + size/2);
+
+  const r = s * 0.24;
+
+  c.shadowColor = "rgba(0,0,0,0.45)";
+  c.shadowBlur = 8;
+  c.shadowOffsetY = 4;
+
+  c.beginPath();
+  c.roundRect(-s/2, -s/2, s, s, r);
+  c.fillStyle = colorHex;
+  c.fill();
+  c.shadowColor = "transparent";
+
+  c.beginPath();
+  c.roundRect(-s/2, -s/2 + s*0.1, s, s*0.9, [0, 0, r, r]);
+  c.fillStyle = "rgba(0, 0, 0, 0.25)";
+  c.fill();
+
+  c.beginPath();
+  c.roundRect(-s/2 + 2, -s/2 + 2, s - 4, s * 0.4, [r, r, 4, 4]);
+  const grad = c.createLinearGradient(0, -s/2, 0, 0);
+  grad.addColorStop(0, "rgba(255, 255, 255, 0.65)");
+  grad.addColorStop(1, "rgba(255, 255, 255, 0.05)");
+  c.fillStyle = grad;
+  c.fill();
+
+  c.beginPath();
+  c.arc(-s/2 + s*0.25, -s/2 + s*0.25, s*0.08, 0, Math.PI*2);
+  c.fillStyle = "rgba(255, 255, 255, 0.8)";
+  c.fill();
+
+  c.beginPath();
+  c.roundRect(-s/2, -s/2, s, s, r);
+  c.lineWidth = 1.5;
+  c.strokeStyle = "rgba(255, 255, 255, 0.4)";
+  c.stroke();
+
+  c.restore();
+}
+
+function drawBackground(){
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  const t = currentTheme();
+
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0, t.bg1);
+  grad.addColorStop(1, t.bg2);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,w,h);
+
+  ctx.fillStyle = "rgba(255,255,255,0.03)";
+  ctx.beginPath();
+  ctx.arc(w*0.2, h*0.3, 120, 0, Math.PI*2);
+  ctx.arc(w*0.8, h*0.7, 160, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawBoard(){
+  const o = boardOrigin();
+  const total = cell * GRID;
+
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.6)";
+  ctx.shadowBlur = 25;
+  ctx.shadowOffsetY = 12;
+  ctx.beginPath();
+  ctx.roundRect(o.x - 10, o.y - 10, total + 20, total + 20, 28);
+  ctx.fillStyle = "rgba(12, 14, 28, 0.85)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  for(let y=0; y<GRID; y++){
+    for(let x=0; x<GRID; x++){
+      const px = o.x + x*cell;
+      const py = o.y + y*cell;
+
+      ctx.beginPath();
+      ctx.roundRect(px + 2, py + 2, cell - 4, cell - 4, 10);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      const block = board[y][x];
+      if(block){
+        const col = block.obstacle ? "#616161" : currentTheme().colors[block.color];
+        drawGem(ctx, px + 2, py + 2, cell - 4, col, 1, block.alpha || 1);
+      }
+    }
+  }
+}
+
+function drawHoverAndPreview(){
+  if(!draggingPiece) return;
+  const o = boardOrigin();
+
+  const gridPos = {
+    x: Math.floor((dragPos.x - o.x) / cell),
+    y: Math.floor((dragPos.y - o.y) / cell)
+  };
+
+  const valid = canPlace(draggingPiece, gridPos.x, gridPos.y);
+
+  draggingPiece.cells.forEach(p => {
+    const gx = gridPos.x + p[0];
+    const gy = gridPos.y + p[1];
+    if(gx >= 0 && gx < GRID && gy >= 0 && gy < GRID){
+      const px = o.x + gx * cell;
+      const py = o.y + gy * cell;
+      drawGem(ctx, px+2, py+2, cell-4, currentTheme().colors[draggingPiece.color], 1, valid ? 0.65 : 0.25);
+    }
+  });
+
+  draggingPiece.cells.forEach(p => {
+    const px = dragPos.x + (p[0] * cell);
+    const py = dragPos.y + (p[1] * cell);
+    drawGem(ctx, px - cell/2, py - cell/2, cell - 4, currentTheme().colors[draggingPiece.color], 1.15, 0.98);
+  });
+}
+
+function renderDockUI(){
+  for(let i=0; i<3; i++){
+    const slot = document.getElementById(`slot${i}`);
+    slot.innerHTML = "";
+    
+    const p = dockPieces[i];
+    if(!p) continue;
+
+    const slotCanvas = document.createElement("canvas");
+    slotCanvas.width = 110;
+    slotCanvas.height = 110;
+    const sCtx = slotCanvas.getContext("2d");
+
+    const maxX = Math.max(...p.cells.map(c=>c[0])) + 1;
+    const maxY = Math.max(...p.cells.map(c=>c[1])) + 1;
+    const pCell = Math.min(85 / maxX, 85 / maxY, 24);
+    const ox = (110 - maxX * pCell)/2;
+    const oy = (110 - maxY * pCell)/2;
+
+    p.cells.forEach(c => {
+      drawGem(sCtx, ox + c[0]*pCell, oy + c[1]*pCell, pCell - 2, currentTheme().colors[p.color], 1, 1);
+    });
+
+    slot.appendChild(slotCanvas);
+  }
+}
+
+function setupDragEvents(){
+  function handleStart(e, index){
+    if(!running || paused || !dockPieces[index]) return;
+    initAudio();
+    dragSourceIndex = index;
+    draggingPiece = dockPieces[index];
+    
+    const touch = e.touches ? e.touches[0] : e;
+    dragPos = { x: touch.clientX, y: touch.clientY - 55 };
+  }
+
+  for(let i=0; i<3; i++){
+    const slot = document.getElementById(`slot${i}`);
+    slot.addEventListener("mousedown", (e) => handleStart(e, i));
+    slot.addEventListener("touchstart", (e) => handleStart(e, i), {passive: true});
+  }
+
+  window.addEventListener("mousemove", (e) => {
+    if(!draggingPiece) return;
+    dragPos = { x: e.clientX, y: e.clientY - 55 };
+  });
+
+  window.addEventListener("touchmove", (e) => {
+    if(!draggingPiece) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    dragPos = { x: touch.clientX, y: touch.clientY - 55 };
+  }, {passive: false});
+
+  window.addEventListener("mouseup", handleEnd);
+  window.addEventListener("touchend", handleEnd);
+
+  function handleEnd(){
+    if(!draggingPiece) return;
+
+    const o = boardOrigin();
+    const gx = Math.floor((dragPos.x - o.x) / cell);
+    const gy = Math.floor((dragPos.y - o.y) / cell);
+
+    if(canPlace(draggingPiece, gx, gy)){
+      draggingPiece.cells.forEach(p => {
+        board[gy + p[1]][gx + p[0]] = {
+          color: draggingPiece.color,
+          alpha: 1
+        };
+        spawnParticles(o.x + (gx + p[0])*cell + cell/2, o.y + (gy + p[1])*cell + cell/2, currentTheme().colors[draggingPiece.color]);
+      });
+
+      score += draggingPiece.size;
+      soundPlace();
+
+      dockPieces[dragSourceIndex] = null;
+      
+      checkLines();
+
+      if(dockPieces.every(p => p === null)){
+        refillDock();
+      } else {
+        renderDockUI();
+      }
+
+      checkGameOver();
+
+    } else {
+      shake = 5;
+      tone(120, 0.08, "sawtooth", 0.03);
+    }
+
+    draggingPiece = null;
+    dragSourceIndex = -1;
+  }
+}
+
+function refillDock(){
+  dockPieces = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+  renderDockUI();
+}
+
+function canPlace(piece, gx, gy){
+  return piece.cells.every(p => {
+    const x = gx + p[0];
+    const y = gy + p[1];
+    return x >= 0 && x < GRID && y >= 0 && y < GRID && !board[y][x];
+  });
+}
+
+function checkLines(){
+  const rows = [];
+  const cols = [];
+
+  for(let y=0; y<GRID; y++){
+    if(board[y].every(cell => cell !== null)) rows.push(y);
+  }
+
+  for(let x=0; x<GRID; x++){
+    let full = true;
+    for(let y=0; y<GRID; y++){
+      if(!board[y][x]){ full = false; break; }
+    }
+    if(full) cols.push(x);
+  }
+
+  const lineCount = rows.length + cols.length;
+
+  if(lineCount > 0){
+    combo++;
+    maxCombo = Math.max(maxCombo, combo);
+
+    const clearedSet = new Set();
+    rows.forEach(y => { for(let x=0; x<GRID; x++) clearedSet.add(`${x},${y}`); });
+    cols.forEach(x => { for(let y=0; y<GRID; y++) clearedSet.add(`${x},${y}`); });
+
+    const gainedScore = clearedSet.size * 10 * combo * level;
+    score += gainedScore;
+    linesCleared += lineCount;
+
+    const o = boardOrigin();
+    clearedSet.forEach(key => {
+      const [x,y] = key.split(",").map(Number);
+      const px = o.x + x*cell + cell/2;
+      const py = o.y + y*cell + cell/2;
+      spawnParticles(px, py, "#ffffff", 12);
+      spawnParticles(px, py, currentTheme().colors[(x+y)%currentTheme().colors.length], 8);
+      board[y][x] = null;
+    });
+
+    spawnFloatingText(`+${gainedScore}`, o.x + (GRID*cell)/2, o.y + (GRID*cell)/3);
+
+    soundClear(lineCount);
+
+    if(combo > 1){
+      showComboAnimation(combo);
+      soundCombo(combo);
+    } else {
+      showToast(`LINEA CLEAR! +${gainedScore}`);
+    }
+
+    checkLevelProgress();
+  } else {
+    combo = 0;
+  }
+
+  updateHUD();
+}
+
+function checkLevelProgress(){
+  const target = 5 + (level - 1) * 3;
+  const progress = Math.min(1, linesCleared / target);
+  progressEl.style.width = `${progress * 100}%`;
+
+  if(linesCleared >= target){
+    level++;
+    linesCleared = 0;
+    progressEl.style.width = "0%";
+    
+    transitionLevel.textContent = level;
+    transitionSub.textContent = `DIFFICOLTÀ +`;
+    levelTransition.classList.add("show");
+    
+    setTimeout(() => {
+      levelTransition.classList.remove("show");
+      // NON si resetta la griglia: i blocchi rimangono!
+      // I nuovi pezzi generati nel dock diventeranno gradualmente più complessi.
+    }, 1400);
+  }
+}
+
+function checkGameOver(){
+  const hasMoves = dockPieces.some(p => {
+    if(!p) return false;
+    for(let y=0; y<GRID; y++){
+      for(let x=0; x<GRID; x++){
+        if(canPlace(p, x, y)) return true;
+      }
+    }
+    return false;
+  });
+
+  if(!hasMoves){
+    setTimeout(endGame, 500);
+  }
+}
+
+function spawnParticles(x, y, color, count=8){
+  for(let i=0; i<count; i++){
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8,
+      life: 0.65,
+      maxLife: 0.65,
+      size: Math.random() * 6 + 3,
+      color
     });
   }
-</script>
+}
 
+function updateParticles(dt){
+  particles = particles.filter(p => {
+    p.life -= dt;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vx *= 0.96;
+    p.vy *= 0.96;
+    return p.life > 0;
+  });
+
+  floatingTexts = floatingTexts.filter(t => {
+    t.life -= dt;
+    t.y -= 45 * dt;
+    return t.life > 0;
+  });
+}
+
+function drawParticles(){
+  particles.forEach(p => {
+    ctx.globalAlpha = p.life / p.maxLife;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * (p.life / p.maxLife), 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  floatingTexts.forEach(t => {
+    ctx.save();
+    ctx.globalAlpha = t.life / t.maxLife;
+    ctx.font = "900 28px 'Fredoka', Arial";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ffeb3b";
+    ctx.shadowColor = "rgba(0,0,0,0.8)";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
+    ctx.fillText(t.text, t.x, t.y);
+    ctx.restore();
+  });
+
+  ctx.globalAlpha = 1;
+}
+
+function spawnFloatingText(text, x, y){
+  floatingTexts.push({ text, x, y, life: 1.0, maxLife: 1.0 });
+}
+
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.remove("show");
+  void toastEl.offsetWidth;
+  toastEl.classList.add("show");
+}
+
+function showComboAnimation(c){
+  comboBanner.textContent = `COMBO x${c}!`;
+  comboBanner.classList.remove("animate");
+  void comboBanner.offsetWidth;
+  comboBanner.classList.add("animate");
+}
+
+function updateHUD(){
+  scoreEl.textContent = score;
+  levelEl.textContent = level;
+  comboEl.textContent = `x${combo}`;
+  modeLabel.textContent = gameMode === "adventure" ? "ADV" : "LIV";
+}
+
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screens[name].classList.add("active");
+}
+
+function startGame(mode){
+  initAudio();
+  gameMode = mode;
+  score = 0;
+  level = 1;
+  combo = 0;
+  maxCombo = 0;
+  linesCleared = 0;
+  continueUsed = false;
+
+  createBoard();
+  refillDock();
+  
+  paused = false;
+  running = true;
+
+  pauseOverlay.classList.remove("show");
+  gameOverOverlay.classList.remove("show");
+
+  showScreen("game");
+  resize();
+  updateHUD();
+  playMusic();
+
+  showToast(gameMode === "adventure" ? "MODALITÀ AVVENTURA!" : "PRONTI? VIA!");
+}
+
+function endGame(){
+  running = false;
+  stopMusic();
+
+  finalScore.textContent = score;
+  finalLevel.textContent = level;
+  finalCombo.textContent = maxCombo;
+
+  continueAdBtn.style.display = continueUsed ? "none" : "block";
+  gameOverOverlay.classList.add("show");
+
+  saveOnlineScore(score);
+}
+
+function getOnlineScores(){
+  return JSON.parse(localStorage.getItem("gb_online_scores") || "[]");
+}
+
+function saveOnlineScore(val){
+  if(val <= 0) return;
+  const scores = getOnlineScores();
+  scores.push({ name: "Player_" + Math.floor(1000 + Math.random()*9000), score: val });
+  scores.sort((a,b) => b.score - a.score);
+  localStorage.setItem("gb_online_scores", JSON.stringify(scores.slice(0, 10)));
+}
+
+function renderLeaderboard(){
+  const scores = getOnlineScores();
+  const defaults = [
+    { name: "GigaBlaster", score: 12500 },
+    { name: "ProPuzzler", score: 9800 },
+    { name: "BlockKing", score: 7400 },
+    { name: "GemMaster", score: 5100 }
+  ];
+  const list = scores.length ? scores : defaults;
+
+  leaderboardList.innerHTML = list.map((s, i) => `
+    <div class="rankRow">
+      <div class="rankNum">#${i+1}</div>
+      <div class="rankName">${s.name}</div>
+      <div class="rankScore">${s.score} pts</div>
+    </div>
+  `).join("");
+}
+
+let adInterval = null;
+continueAdBtn.addEventListener("click", () => {
+  gameOverOverlay.classList.remove("show");
+  showScreen("ad");
+
+  let count = 5;
+  adCountdown.textContent = count;
+  adClose.style.display = "none";
+
+  if (adInterval) clearInterval(adInterval);
+  adInterval = setInterval(() => {
+    count--;
+    adCountdown.textContent = count;
+    if(count <= 0){
+      clearInterval(adInterval);
+      adCountdown.textContent = "COMPLETATO!";
+      adClose.style.display = "block";
+    }
+  }, 1000);
+});
+
+adClose.addEventListener("click", () => {
+  continueUsed = true;
+  showScreen("game");
+  running = true;
+  
+  for(let y=2; y<6; y++){
+    for(let x=2; x<6; x++){
+      board[y][x] = null;
+    }
+  }
+  refillDock();
+  playMusic();
+  showToast("RESUSCITATO!");
+});
+
+document.getElementById("classicBtn").onclick = () => startGame("classic");
+document.getElementById("adventureBtn").onclick = () => startGame("adventure");
+document.getElementById("restartBtn").onclick = () => startGame(gameMode);
+document.getElementById("leaderboardBtn").onclick = () => { renderLeaderboard(); showScreen("leaderboard"); };
+document.getElementById("leaderboardBack").onclick = () => showScreen("menu");
+document.getElementById("settingsBtn").onclick = () => showScreen("settings");
+
+// Collegamento corretto per aprire Impostazioni dal menu di pausa
+document.getElementById("pauseSettingsBtn").onclick = () => {
+  showScreen("settings");
+};
+
+// Salvataggio e ritorno corretto dalle impostazioni sia dal menu che dalla pausa
+document.getElementById("settingsBack").onclick = () => { 
+  saveSettings(); 
+  if (running) {
+    showScreen("game");
+  } else {
+    showScreen("menu");
+  }
+};
+
+document.getElementById("pauseBtn").onclick = () => { paused = true; pauseOverlay.classList.add("show"); stopMusic(); };
+document.getElementById("resumeBtn").onclick = () => { paused = false; pauseOverlay.classList.remove("show"); playMusic(); };
+document.getElementById("quitBtn").onclick = () => { running = false; stopMusic(); pauseOverlay.classList.remove("show"); showScreen("menu"); };
+document.getElementById("menuFromGameBtn").onclick = () => { gameOverOverlay.classList.remove("show"); showScreen("menu"); };
+
+musicSwitch.onclick = () => { settings.music = !settings.music; saveSettings(); updateSettingsUI(); if(settings.music) playMusic(); else stopMusic(); };
+sfxSwitch.onclick = () => { settings.sfx = !settings.sfx; saveSettings(); updateSettingsUI(); };
+musicVolume.oninput = () => { settings.volume = Number(musicVolume.value); saveSettings(); };
+
+function loop(time){
+  const dt = Math.min(0.05, (time - lastTime) / 1000 || 0);
+  lastTime = time;
+
+  if(running && !paused){
+    updateParticles(dt);
+  }
+
+  drawBackground();
+  if(screens.game.classList.contains("active")){
+    ctx.save();
+    if(shake > 0){
+      ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
+      shake *= 0.9;
+    }
+    drawBoard();
+    drawHoverAndPreview();
+    drawParticles();
+    ctx.restore();
+  }
+
+  requestAnimationFrame(loop);
+}
+
+setupDragEvents();
+resize();
+requestAnimationFrame(loop);
+
+})();
+</script>
 </body>
 </html>
